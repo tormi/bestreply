@@ -2,13 +2,15 @@
 Installation
 --------------
 1. Put the bestreply directory in your site modules directory.  
-   See http://drupal.org/node/70151 for tips on where to install contributed modules.
+   See http://drupal.org/node/70151 for tips on where to
+   install contributed modules.
 2. Enable bestreply via admin/modules.
 	
 Settings page
 --------------
 admin/config/content/bestreply/list
-Lists the best replys, author, who they were marked by, and when they were marked.
+Lists the best replys, author, who they were marked by,
+and when they were marked.
 
 admin/config/content/bestreply
 Set the name, text you wish to use for best reply links.  

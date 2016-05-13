@@ -84,10 +84,10 @@ function bestreply_ismarked($nid = NULL) {
 
 /**
  * Alter the links of a comment.
- * Implementation of hook_comment_links_alter()
+ * Implementation of hook_comment_links_alter().
  */
 function bestreply_comment_links_alter(array &$links, CommentInterface $entity, array &$context) {
-  if($context["view_mode"] == 'full'){
+  if($context["view_mode"] == 'full') {
     $user = \Drupal::currentUser();
     $nts = \Drupal::config('bestreply.settings')->get('types');
     $ntype = bestreply_parent_type($entity->getCommentedEntityId());
@@ -107,7 +107,10 @@ function bestreply_comment_links_alter(array &$links, CommentInterface $entity, 
         $best_reply_link['comment-bestreply'] = array(
           'title' => $brname,
           'url' => Url::fromRoute('bestreply.mark', ['comment' => $entity->id()]),
-          'attributes' => array('title' => t('Mark this comment as the !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_mark')),
+          'attributes' => array(
+            'title' => t('Mark this comment as the !bestreply.', array('!bestreply' => $brname)),
+            'class' => array('br_mark'),
+          ),
         );
       }
     }
@@ -117,7 +120,9 @@ function bestreply_comment_links_alter(array &$links, CommentInterface $entity, 
           $best_reply_link['comment-bestreply'] = array(
             'title' => t('Clear !bestreply', array('!bestreply' => $brname)),
             'url' => Url::fromRoute('bestreply.clear', ['comment' => $entity->id()]),
-            'attributes' => array('title' => t('Clear this !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_clear')),
+            'attributes' => array(
+              'title' => t('Clear this !bestreply.', array('!bestreply' => $brname)),
+              'class' => array('br_clear')),
           );
         }
       }
@@ -126,7 +131,9 @@ function bestreply_comment_links_alter(array &$links, CommentInterface $entity, 
           $best_reply_link['comment-bestreply'] = array(
             'title' => $brname,
             'url' => Url::fromRoute('bestreply.mark', ['comment' => $entity->id()]),
-            'attributes' => array('title' => t('Set this comment as the !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_mark')),
+            'attributes' => array(
+              'title' => t('Set this comment as the !bestreply.', array('!bestreply' => $brname)),
+              'class' => array('br_mark')),
           );
         }
       }
@@ -177,7 +184,8 @@ function bestreply_preprocess_comment(&$variables) {
 function bestreply_comment_load($comments) {
   foreach ($comments as $comment) {  
     if ($comment->id() && $comment->id() == bestreply_ismarked($comment->getCommentedEntityId()) && \Drupal::currentUser()->hasPermission('view bestreply')) {
-      $comment->bestreply = 1; // add new variable to the comment so we can easily theme.
+      // Add new variable to the comment so we can easily theme.
+      $comment->bestreply = 1; 
     }
     else {
       $comment->bestreply = 0;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\bestreply\Controller\BestReplyController.
- */
-
 namespace Drupal\bestreply\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -31,7 +26,13 @@ class BestReplyController extends ControllerBase {
         if ($this->bestreply_ismarked($comment->getCommentedEntityId())) {
           $action = 'replace';
           $rt = db_query('UPDATE {bestreply} SET cid = :cid, aid = :aid, uid = :uid, dt = :dt  where nid = :nid',
-              array('cid' => $comment->id(), 'aid' => $comment->getOwnerId(), 'uid' => $user->id(), 'dt' => $dt, 'nid' => $comment->getCommentedEntityId()));
+              array(
+                'cid' => $comment->id(),
+                'aid' => $comment->getOwnerId(),
+                'uid' => $user->id(),
+                'dt' => $dt,
+                'nid' => $comment->getCommentedEntityId()
+          ));
         }
         else{
           $action ='mark';

@@ -11,7 +11,7 @@
 /**
  * Implements hook_uninstall().
  *
- * It's good to clean up after ourselves
+ * It's good to clean up after ourselves.
  *
  * @ingroup bestreply
  */
@@ -32,7 +32,7 @@ function bestreply_schema() {
       'cid' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
       'aid' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
       'uid' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
-      'dt' => array('type' => 'int', 'not null' => TRUE, 'default' => 0)
+      'dt' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
     ),
     'primary key' => array('nid'),
   );
