@@ -51,7 +51,7 @@ function bestreply_node_view(array &$build, EntityInterface $entity, EntityViewD
     $build['#attached']['library'][] = 'bestreply/bestreply';
     $build['#attached']['drupalSettings']['bestreply']['name'] = $brname;
     $build['#attached']['drupalSettings']['bestreply']['ismarked'] = $brid;
-  
+
     if ($if_comments_available && $brid && \Drupal::currentUser()->hasPermission('view bestreply')) {
       $bestreply_comment_link = t('View !bestreply.', array('!bestreply' => $brname));
       $links['bestreply-view'] = array(
@@ -82,6 +82,10 @@ function bestreply_ismarked($nid = NULL) {
   return db_query('SELECT cid FROM {bestreply} WHERE nid = :nid', array('nid' => $nid))->fetchField();
 }
 
+/**
+ * Alter the links of a comment.
+ * Implementation of hook_comment_links_alter()
+ */
 function bestreply_comment_links_alter(array &$links, CommentInterface $entity, array &$context) {
   if($context["view_mode"] == 'full'){
     $user = \Drupal::currentUser();
@@ -101,9 +105,9 @@ function bestreply_comment_links_alter(array &$links, CommentInterface $entity, 
     if (!$brcid) {
       if (($author && \Drupal::currentUser()->hasPermission('mark bestreply')) || $moderator) {
         $best_reply_link['comment-bestreply'] = array(
-            'title' => $brname,
-            'url' => Url::fromRoute('bestreply.mark', ['comment' => $entity->id()]),
-            'attributes' => array('title' => t('Mark this comment as the !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_mark')),
+          'title' => $brname,
+          'url' => Url::fromRoute('bestreply.mark', ['comment' => $entity->id()]),
+          'attributes' => array('title' => t('Mark this comment as the !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_mark')),
         );
       }
     }
@@ -111,18 +115,18 @@ function bestreply_comment_links_alter(array &$links, CommentInterface $entity, 
       if ($brcid == $entity->id()) {
         if (($author && \Drupal::currentUser()->hasPermission('clear bestreply')) || $moderator) {
           $best_reply_link['comment-bestreply'] = array(
-              'title' => t('Clear !bestreply', array('!bestreply' => $brname)),
-              'url' => Url::fromRoute('bestreply.clear', ['comment' => $entity->id()]),
-              'attributes' => array('title' => t('Clear this !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_clear')),
+            'title' => t('Clear !bestreply', array('!bestreply' => $brname)),
+            'url' => Url::fromRoute('bestreply.clear', ['comment' => $entity->id()]),
+            'attributes' => array('title' => t('Clear this !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_clear')),
           );
         }
       }
       else {
         if (($author && \Drupal::currentUser()->hasPermission('mark bestreply') && $brchange) || $moderator) {
           $best_reply_link['comment-bestreply'] = array(
-              'title' => $brname,
-              'url' => Url::fromRoute('bestreply.mark', ['comment' => $entity->id()]),
-              'attributes' => array('title' => t('Set this comment as the !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_mark')),
+            'title' => $brname,
+            'url' => Url::fromRoute('bestreply.mark', ['comment' => $entity->id()]),
+            'attributes' => array('title' => t('Set this comment as the !bestreply.', array('!bestreply' => $brname)), 'class' => array('br_mark')),
           );
         }
       }
@@ -131,9 +135,9 @@ function bestreply_comment_links_alter(array &$links, CommentInterface $entity, 
   }
   if($best_reply_link){
     $links['bestreply'] = array(
-        '#theme' => 'links__comment__bestreply',
-        '#attributes' => array('class' => array('links', 'inline')),
-        '#links' => $best_reply_link
+      '#theme' => 'links__comment__bestreply',
+      '#attributes' => array('class' => array('links', 'inline')),
+      '#links' => $best_reply_link
     );    
   }
 

@@ -9,10 +9,7 @@ namespace Drupal\bestreply\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\comment\CommentInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 use Drupal\Component\Serialization\Json;
-use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 
@@ -24,16 +21,14 @@ class BestReplyController extends ControllerBase {
   /**
    * Insert or update the marked comment info.
    */
-  public function mark(CommentInterface $comment, $js = null) {
+  public function mark(CommentInterface $comment, $js = NULL) {
     $user = \Drupal::currentUser();
     $rt = FALSE;
     $dt = REQUEST_TIME;
 
     if ($comment->getCommentedEntityTypeId() == 'node') {
       if ($comment->isPublished()) {
-        if ($old_cid = $this->bestreply_ismarked($comment->getCommentedEntityId())) {
-          // find the last time
-          $old_time = db_query("SELECT dt from {bestreply} WHERE nid = :nid", array('nid' => $comment->getCommentedEntityId()))->fetchCol();
+        if ($this->bestreply_ismarked($comment->getCommentedEntityId())) {
           $action = 'replace';
           $rt = db_query('UPDATE {bestreply} SET cid = :cid, aid = :aid, uid = :uid, dt = :dt  where nid = :nid',
               array('cid' => $comment->id(), 'aid' => $comment->getOwnerId(), 'uid' => $user->id(), 'dt' => $dt, 'nid' => $comment->getCommentedEntityId()));
@@ -41,9 +36,15 @@ class BestReplyController extends ControllerBase {
         else{
           $action ='mark';
           $rt = db_query('INSERT into {bestreply} values( :nid, :cid, :aid, :uid, :dt)',
-              array('nid' => $comment->getCommentedEntityId(), 'cid' => $comment->id(), 'aid' => $comment->getOwnerId(), 'uid' => $user->id(), 'dt' => $dt));
+              array(
+                'nid' => $comment->getCommentedEntityId(),
+                'cid' => $comment->id(),
+                'aid' => $comment->getOwnerId(),
+                'uid' => $user->id(),
+                'dt' => $dt
+          ));
         }
-        
+
         if ($js) {
           $status = ($rt) ? TRUE : FALSE;
           print Json::encode(array(
@@ -70,24 +71,25 @@ class BestReplyController extends ControllerBase {
     return db_query('SELECT cid FROM {bestreply} WHERE nid = :nid', array('nid' => $nid))->fetchField();
   }
 
+  /**
+   * Clear the marked comment info.
+   */  
   public function clear(CommentInterface $comment, $js = null) {
-      $user = \Drupal::currentUser();
-      $dt = REQUEST_TIME;
-      if ($this->bestreply_ismarked($comment->getCommentedEntityId())) {
-        $rt = db_query("DELETE FROM {bestreply} WHERE nid = :nid", array('nid' => $comment->getCommentedEntityId()));
-      }
-      if ($js) {
-        $status = ($rt) ? TRUE : FALSE;
-        print Json::encode(array(
-            'status' => $status,
-            'cid' => $comment->id(),
-            'action' => 'clear',
-        ));
-        exit;
-      }
-      else {
-        return new RedirectResponse(Url::fromUri('/node/'. $comment->getCommentedEntityId(), array()));
-      }    
+    if ($this->bestreply_ismarked($comment->getCommentedEntityId())) {
+      $rt = db_query("DELETE FROM {bestreply} WHERE nid = :nid", array('nid' => $comment->getCommentedEntityId()));
+    }
+    if ($js) {
+      $status = ($rt) ? TRUE : FALSE;
+      print Json::encode(array(
+        'status' => $status,
+        'cid' => $comment->id(),
+        'action' => 'clear',
+      ));
+      exit;
+    }
+    else {
+      return new RedirectResponse(Url::fromUri('/node/'. $comment->getCommentedEntityId(), array()));
+    }    
   }
 
   /**
@@ -99,48 +101,48 @@ class BestReplyController extends ControllerBase {
     array('data' => 'author', 'field' => 'cname', 'sort' => 'asc'),
     array('data' => 'marked by', 'field' => 'name', 'sort' => 'asc'),
     array('data' => 'when', 'field' => 'dt', 'sort' => 'asc')
-  );
-
-  $sql = db_select('bestreply', 'b')->fields('b', array('nid', 'cid', 'uid', 'aid', 'dt'));
-  $sql->join('node_field_data', 'n', 'n.nid = b.nid' );
-  $sql->addField('n', 'title');
-  $sql->join('comment_field_data', 'c', 'c.cid = b.cid');
-  $sql->addField('c', 'name', 'cname');
-  $sql->join('users_field_data', 'u', 'u.uid = b.uid');
-  $sql->addField('u', 'name');
-
-  $sql = $sql->extend('Drupal\Core\Database\Query\PagerSelectExtender')->extend('Drupal\Core\Database\Query\TableSortExtender')->orderByHeader($head);
-  $result = $sql->execute()->fetchAll();
-
-  foreach ($result as $reply) {
-    $options = array('fragment' => 'comment-' . $reply->cid);
-    $author = !empty($reply->aid) ? Link::fromTextAndUrl($reply->cname, Url::fromUri('entity:user/'.$reply->aid)) : \Drupal::config('user.settings')->get('anonymous');
-    $reply_user = !empty($reply->uid) ? Link::fromTextAndUrl($reply->name, Url::fromUri('entity:user/'.$reply->uid)) : \Drupal::config('user.settings')->get('anonymous'); 
-    $rows[] = array(
-      Link::fromTextAndUrl($reply->title, Url::fromUri('entity:node/'.$reply->nid,$options)),
-      $author,
-      $reply_user,
-      $this->t('!time ago', array('!time' => \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - $reply->dt)))
     );
-  }
+
+    $sql = db_select('bestreply', 'b')->fields('b', array('nid', 'cid', 'uid', 'aid', 'dt'));
+    $sql->join('node_field_data', 'n', 'n.nid = b.nid' );
+    $sql->addField('n', 'title');
+    $sql->join('comment_field_data', 'c', 'c.cid = b.cid');
+    $sql->addField('c', 'name', 'cname');
+    $sql->join('users_field_data', 'u', 'u.uid = b.uid');
+    $sql->addField('u', 'name');
   
-  if (isset($rows)) {
-    // Add the pager
-    $build['content'] = array(
-    '#theme' => 'table',
-    '#header' => $head,
-    '#rows' => $rows
-    );
-    $build['pager'] = array(
-      '#theme' => 'pager',
-      '#weight' => 5,
-    );
-  return $build;
-  }
-  else {
-    return array(
+    $sql = $sql->extend('Drupal\Core\Database\Query\PagerSelectExtender')->extend('Drupal\Core\Database\Query\TableSortExtender')->orderByHeader($head);
+    $result = $sql->execute()->fetchAll();
+  
+    foreach ($result as $reply) {
+      $options = array('fragment' => 'comment-' . $reply->cid);
+      $author = !empty($reply->aid) ? Link::fromTextAndUrl($reply->cname, Url::fromUri('entity:user/'.$reply->aid)) : \Drupal::config('user.settings')->get('anonymous');
+      $reply_user = !empty($reply->uid) ? Link::fromTextAndUrl($reply->name, Url::fromUri('entity:user/'.$reply->uid)) : \Drupal::config('user.settings')->get('anonymous'); 
+      $rows[] = array(
+        Link::fromTextAndUrl($reply->title, Url::fromUri('entity:node/'.$reply->nid,$options)),
+        $author,
+        $reply_user,
+        $this->t('!time ago', array('!time' => \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - $reply->dt)))
+      );
+    }
+  
+    if (isset($rows)) {
+      // Add the pager
+      $build['content'] = array(
+        '#theme' => 'table',
+        '#header' => $head,
+        '#rows' => $rows
+      );
+      $build['pager'] = array(
+        '#theme' => 'pager',
+        '#weight' => 5,
+      );
+    return $build;
+    }
+    else {
+      return array(
         '#markup' => t('No results to display') 
-    );
-  }
+      );
+    }
   }
 }
