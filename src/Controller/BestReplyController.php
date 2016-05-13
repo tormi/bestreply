@@ -23,7 +23,7 @@ class BestReplyController extends ControllerBase {
 
     if ($comment->getCommentedEntityTypeId() == 'node') {
       if ($comment->isPublished()) {
-        if ($this->bestreply_ismarked($comment->getCommentedEntityId())) {
+        if (BestReplyController::bestreply_ismarked($comment->getCommentedEntityId())) {
           $action = 'replace';
           $rt = db_query('UPDATE {bestreply} SET cid = :cid, aid = :aid, uid = :uid, dt = :dt  where nid = :nid',
               array(
@@ -31,41 +31,38 @@ class BestReplyController extends ControllerBase {
                 'aid' => $comment->getOwnerId(),
                 'uid' => $user->id(),
                 'dt' => $dt,
-                'nid' => $comment->getCommentedEntityId()
+                'nid' => $comment->getCommentedEntityId(),
           ));
         }
-        else{
-          $action ='mark';
+        else {
+          $action = 'mark';
           $rt = db_query('INSERT into {bestreply} values( :nid, :cid, :aid, :uid, :dt)',
               array(
                 'nid' => $comment->getCommentedEntityId(),
                 'cid' => $comment->id(),
                 'aid' => $comment->getOwnerId(),
                 'uid' => $user->id(),
-                'dt' => $dt
+                'dt' => $dt,
           ));
         }
 
         if ($js) {
           $status = ($rt) ? TRUE : FALSE;
           print Json::encode(array(
-              'status' => $status,
-              'cid' => $comment->id(),
-              'action' => $action,
+            'status' => $status,
+            'cid' => $comment->id(),
+            'action' => $action,
           ));
           exit;
         }
-        else{
-          return new RedirectResponse(Url::fromUri('/node/'. $comment->getCommentedEntityId(), array('fragment' => 'comment-' . $comment->id())));
-        }        
       }
     }
-}
+  }
 
   /**
    * Return the marked cid (comment id) for the given node id.
    */
-  public function bestreply_ismarked($nid = NULL) {
+  static function bestreply_ismarked($nid = NULL) {
     if (!$nid) {
       return FALSE;
     }
@@ -76,7 +73,7 @@ class BestReplyController extends ControllerBase {
    * Clear the marked comment info.
    */  
   public function clear(CommentInterface $comment, $js = null) {
-    if ($this->bestreply_ismarked($comment->getCommentedEntityId())) {
+    if (BestReplyController::bestreply_ismarked($comment->getCommentedEntityId())) {
       $rt = db_query("DELETE FROM {bestreply} WHERE nid = :nid", array('nid' => $comment->getCommentedEntityId()));
     }
     if ($js) {
@@ -87,10 +84,7 @@ class BestReplyController extends ControllerBase {
         'action' => 'clear',
       ));
       exit;
-    }
-    else {
-      return new RedirectResponse(Url::fromUri('/node/'. $comment->getCommentedEntityId(), array()));
-    }    
+    }   
   }
 
   /**
