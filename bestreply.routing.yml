@@ -8,7 +8,7 @@ bestreply.settings:
 bestreply.list:
   path: '/admin/config/content/bestreply/list'
   defaults:
-    _controller: '\Drupal\bestreply\Controller\BestReplyController::reply_comment_list'
+    _controller: '\Drupal\bestreply\Controller\BestReplyController::replyCommentList'
     _title: 'Best Reply'    
   requirements:
     _permission: 'administer bestreply'   

@@ -35,7 +35,7 @@ function bestreply_node_view(array &$build, EntityInterface $entity, EntityViewD
     if (!isset($nts[$entity->bundle()]) || $nts[$entity->bundle()] == '0') {
       return;
     }
-    $brid = BestReplyController::bestreply_ismarked($entity->id());
+    $brid = BestReplyController::bestreplyIsmarked($entity->id());
 
     $comment_manager = \Drupal::service('comment.manager');
     $fields = $comment_manager->getFields($entity->getEntityTypeId());
@@ -47,7 +47,7 @@ function bestreply_node_view(array &$build, EntityInterface $entity, EntityViewD
       }
     }
 
-    $brid = BestReplyController::bestreply_ismarked($entity->id());
+    $brid = BestReplyController::bestreplyIsmarked($entity->id());
     $build['#attached']['library'][] = 'bestreply/bestreply';
     $build['#attached']['drupalSettings']['bestreply']['name'] = $brname;
     $build['#attached']['drupalSettings']['bestreply']['ismarked'] = $brid;
@@ -74,7 +74,7 @@ function bestreply_node_view(array &$build, EntityInterface $entity, EntityViewD
 
 /**
  * Alter the links of a comment.
- * 
+ *
  * Implementation of hook_comment_links_alter().
  */
 function bestreply_comment_links_alter(array &$links, CommentInterface $entity, array &$context) {
@@ -91,7 +91,7 @@ function bestreply_comment_links_alter(array &$links, CommentInterface $entity, 
     $nuid = $entity->get('uid')->target_id;
     $author = ($user->id() == $nuid);
     $moderator = $user->hasPermission('moderate bestreply');
-    $brcid = BestReplyController::bestreply_ismarked($entity->getCommentedEntityId());
+    $brcid = BestReplyController::bestreplyIsmarked($entity->getCommentedEntityId());
     $best_reply_link = array();
     if (!$brcid) {
       if (($author && \Drupal::currentUser()->hasPermission('mark bestreply')) || $moderator) {
@@ -125,7 +125,7 @@ function bestreply_comment_links_alter(array &$links, CommentInterface $entity, 
             'url' => Url::fromRoute('bestreply.mark', ['comment' => $entity->id()]),
             'attributes' => array(
               'title' => t('Set this comment as the !bestreply.', array('!bestreply' => $brname)),
-              'class' => array('br_mark')
+              'class' => array('br_mark'),
             ),
           );
         }
@@ -151,7 +151,9 @@ function bestreply_parent_type($nid) {
 }
 
 /**
- * @see template_preprocess_comment.
+ * Check if bestreply comment exist on this page.
+ *
+ * @see template_preprocess_comment
  */
 function bestreply_preprocess_comment(&$variables) {
   $comment = $variables['elements']['#comment'];
@@ -165,11 +167,11 @@ function bestreply_preprocess_comment(&$variables) {
       $attributes += array(
         'class' => array('permalink', 'bestreply'),
         'fragment' => 'comment-' . $comment->id(),
-        'rel' => 'bookmark'
+        'rel' => 'bookmark',
       );
       $uri->setOption('attributes', $attributes);
       $variables['title'] = \Drupal::l($comment->getSubject(), $uri);
-    }    
+    }
     $variables['#attached']['drupalSettings']['bestreply']['onthispage'] = 1;
 
   }
@@ -179,10 +181,10 @@ function bestreply_preprocess_comment(&$variables) {
  * Implements hook_comment_load().
  */
 function bestreply_comment_load($comments) {
-  foreach ($comments as $comment) {  
-    if ($comment->id() && $comment->id() == BestReplyController::bestreply_ismarked($comment->getCommentedEntityId()) && \Drupal::currentUser()->hasPermission('view bestreply')) {
+  foreach ($comments as $comment) {
+    if ($comment->id() && $comment->id() == BestReplyController::bestreplyIsmarked($comment->getCommentedEntityId()) && \Drupal::currentUser()->hasPermission('view bestreply')) {
       // Add new variable to the comment so we can easily theme.
-      $comment->bestreply = 1; 
+      $comment->bestreply = 1;
     }
     else {
       $comment->bestreply = 0;

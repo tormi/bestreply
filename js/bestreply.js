@@ -28,8 +28,8 @@
               BestReply.rt = true;
             }
           })
-        return BestReply.rt;
-      })
+          return BestReply.rt;
+        });
     }
   }
 
@@ -44,7 +44,7 @@
     var bp = drupalSettings.path.baseUrl;
     var br_name = drupalSettings.bestreply.name;
 
-    if( action == 'clear') {
+    if (action == 'clear') {
       BestReply.setMark($('.br_clear'), bp + 'bestreply/mark/' + cid);
       // Remove the view link from node.
       $('.bestreply-view').remove();
@@ -53,7 +53,7 @@
       // Remove the last class when it's not on the last element.
       $('.node .links li.last').not(':last').removeClass('last');
     }
-    else if(action == 'replace') {
+    else if (action == 'replace') {
       // Change the view link.
       $('.links .br_view').attr('href', '#comment-' + cid);
 
