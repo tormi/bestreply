@@ -45,7 +45,7 @@
     var bp = drupalSettings.path.baseUrl;
     var br_name = drupalSettings.bestreply.name;
 
-    if (action == 'clear') {
+    if (action === 'clear') {
       BestReply.setMark($('.br_clear'), bp + 'bestreply/mark/' + cid);
       // Remove the view link from node.
       $('.bestreply-view').remove();
@@ -54,17 +54,18 @@
       // Remove the last class when it's not on the last element.
       $('.node .links li.last').not(':last').removeClass('last');
     }
-    else if (action == 'replace') {
+    else if (action === 'replace') {
       // Change the view link.
       $('.links .br_view').attr('href', '#comment-' + cid);
 
       // Change the href.
       var href = $('.br_clear').attr('href');
+      var nhref;
       if (href) {
-        var nhref = href.replace('clear', 'mark');
+        nhref = href.replace('clear', 'mark');
       }
       else {
-        var nhref = '/bestreply/mark/' + drupalSettings.bestreply.ismarked;
+        nhref = '/bestreply/mark/' + drupalSettings.bestreply.ismarked;
       }
       BestReply.setMark($('.br_clear'), nhref);
       BestReply.setClear(ele, bp, cid);
@@ -77,7 +78,7 @@
       $('.node .links li:last').not('.last').addClass('last');
       $('.node .links li.last').not(':last').removeClass('last');
     }
-  }
+  };
 
   /**
    * Set the link element to Clear.
@@ -94,7 +95,7 @@
       .text('Clear ' + br_name)
       .removeClass('br_mark')
       .addClass('br_clear');
-  }
+  };
 
   /**
    * Set the link element to Mark.
@@ -103,12 +104,12 @@
    * @param {string} nhref, New url
    * @param {string} br_name, Name used for best reply
  */
-  BestReply.setMark = function (ele, nhref){
+  BestReply.setMark = function (ele, nhref) {
     var br_name = drupalSettings.bestreply.name;
     $(ele).attr('href', nhref)
       .removeClass('br_clear')
       .addClass('br_mark')
       .attr('title', 'Mark as the ' + br_name)
       .text(br_name);
-  }
+  };
 })(jQuery);
