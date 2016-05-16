@@ -99,9 +99,9 @@ class BestReplyController extends ControllerBase {
     );
 
     $sql = db_select('bestreply', 'b')
-    ->fields('b', array('nid', 'cid', 'uid', 'aid', 'dt'));
+      ->fields('b', array('nid', 'cid', 'uid', 'aid', 'dt'));
 
-    $sql->join('node_field_data', 'n', 'n.nid = b.nid' );
+    $sql->join('node_field_data', 'n', 'n.nid = b.nid');
     $sql->addField('n', 'title');
     $sql->join('comment_field_data', 'c', 'c.cid = b.cid');
     $sql->addField('c', 'name', 'cname');
@@ -114,12 +114,12 @@ class BestReplyController extends ControllerBase {
     foreach ($result as $reply) {
       $options = array('fragment' => 'comment-' . $reply->cid);
       $author = !empty($reply->aid) ? Link::fromTextAndUrl($reply->cname, Url::fromUri('entity:user/' . $reply->aid)) : \Drupal::config('user.settings')->get('anonymous');
-      $reply_user = !empty($reply->uid) ? Link::fromTextAndUrl($reply->name, Url::fromUri('entity:user/' . $reply->uid)) : \Drupal::config('user.settings')->get('anonymous'); 
+      $reply_user = !empty($reply->uid) ? Link::fromTextAndUrl($reply->name, Url::fromUri('entity:user/' . $reply->uid)) : \Drupal::config('user.settings')->get('anonymous');
       $rows[] = array(
-        Link::fromTextAndUrl($reply->title, Url::fromUri('entity:node/' . $reply->nid,$options)),
+        Link::fromTextAndUrl($reply->title, Url::fromUri('entity:node/' . $reply->nid, $options)),
         $author,
         $reply_user,
-        $this->t('!time ago', array('!time' => \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - $reply->dt)))
+        $this->t('!time ago', array('!time' => \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - $reply->dt))),
       );
     }
 

@@ -4,6 +4,7 @@
  */
 
 (function ($) {
+  'use strict';
   // Namespace Object.
   var BestReply = BestReply || {};
 
@@ -17,7 +18,7 @@
           $.ajax({
             url: self.attr('href'),
             type: 'GET',
-            data: { js : 'true' },
+            data: {js: 'true'},
             dataType: 'json',
             timeout: 4000,
             success: function (json) {
@@ -27,18 +28,18 @@
               // Continue loading the page.
               BestReply.rt = true;
             }
-          })
+          });
           return BestReply.rt;
         });
     }
-  }
+  };
 
   /**
    * Change the links to suit the new bestreply.
    *
-   * @param ele, Link element that was clicked
-   * @param action, Action to perform (clear, replace, mark)
-   * @param cid, Comment Id
+   * @param {string} ele, Link element that was clicked
+   * @param {string} action, Action to perform (clear, replace, mark)
+   * @param {int} cid, Comment Id
  */
   BestReply.brChange = function (ele, action, cid) {
     var bp = drupalSettings.path.baseUrl;
@@ -81,10 +82,10 @@
   /**
    * Set the link element to Clear.
    *
-   * @param ele, Link element to change
-   * @param bp, Base path
-   * @param cid, Comment Id
-   * @param br_name, Name used for best reply
+   * @param {string} ele, Link element to change
+   * @param {string} bp, Base path
+   * @param {int} cid, Comment Id
+   * @param {string} br_name, Name used for best reply
  */
   BestReply.setClear = function (ele, bp, cid) {
     var br_name = drupalSettings.bestreply.name;
@@ -98,9 +99,9 @@
   /**
    * Set the link element to Mark.
    *
-   * @param ele, Link element to change
-   * @param nhref, New url
-   * @param br_name, Name used for best reply
+   * @param {string} ele, Link element to change
+   * @param {string} nhref, New url
+   * @param {string} br_name, Name used for best reply
  */
   BestReply.setMark = function (ele, nhref){
     var br_name = drupalSettings.bestreply.name;
